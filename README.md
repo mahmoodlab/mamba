@@ -1,4 +1,4 @@
-# MAMBA <img src=https://raw.githubusercontent.com/andrewsong90/temp/main/docs/images/MAMBA_logo.png width="250" align="right"> 
+# MAMBA <img src=docs/images/MAMBA_logo.png width="250" align="right"> 
 
 ### Weakly Supervised AI for Efficient Analysis of 3D Pathology Samples
 
@@ -8,19 +8,19 @@
 With the rapid growth and adoption of 3D spatial biology and pathology techniques by researchers and clinicians, MAMBA provides a general and efficient framework for 3D weakly supervised learning for clinical decision support and to reveal novel 3D morphological biomarkers and insights for prognosis and therapeutic response.  
 
 <div>
-<img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/CT.png width="500" align="left">   
+<img src=docs/images/CT.png width="500" align="left">   
 <div>
-   <img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/white.png width="100" align="right">
-   <img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/CT_heatmaps.gif width="300" align="right"> 
+   <img src=docs/images/white.png width="100" align="right">
+   <img src=docs/images/CT_heatmaps.gif width="300" align="right"> 
 </div>
 </div>
 
 <div>
-<img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/OTLS.png width="500" align="left">
+<img src=docs/images/OTLS.png width="400" align="left">
 <div>
-   <img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/white.png width="250" align="right">
-   <img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/white.png width="200" align="right">
-   <img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/OTLS_heatmap.gif width="300" align="right"> 
+   <img src=docs/images/white.png width="250" align="right">
+   <img src=docs/images/white.png width="200" align="right">
+   <img src=docs/images/OTLS_heatmap.gif width="350" align="right"> 
 </div>
 </div>
 
@@ -28,7 +28,7 @@ With the rapid growth and adoption of 3D spatial biology and pathology technique
 © This code and corresponding models are made available for non-commercial academic purposes and is licenced under [the Creative Commons Attribution Non Commercial No Derivatives 4.0 International license](https://creativecommons.org/licenses/by-nc-nd/4.0/). Commercial entities may contact us or the Mass General Brigham Innovations office.
 
 ## Updates
-(07/27/23) The github is now live. Detailed tutorials are coming soon.
+**(07/27/23)** The github is now live. Detailed tutorials are coming soon.
 
 ## Installation
 Run the following code to install all dependencies.
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 ```
 
 ## Volumetric image Preprocessing
-<img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/workflow_github_preprocessing.png> 
+<img src=docs/images/workflow_github_preprocessing.png> 
 
 ### Tissue segmentation & patching
 We treat the volumetric image as a stack of 2D images and perform tissue segmentation serially on the stack. 
@@ -81,7 +81,7 @@ The h5 files have the following format (e.g., subject name: '00001', block name:
   * list of (z, x, y)
 
 ## Computational processing
-<img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/workflow_github_computational.png> 
+<img src=docs/images/workflow_github_computational.png> 
 
 ### Feature extraction
 To perform feature extraction, run the following command
@@ -94,9 +94,10 @@ Some flags include:
 * `--patch_mode`: '2D' for stacks of 2D slices processing and '3D' for 3D processing
 * `--batch_size`: Batch size (number of patches) for feature extraction
 * `--data_mode`: Input data modality
-  * 'CT' (applicable for 2D/3D data)
-  * 'OTLS' (applicable for 2D/3D data)
+  * **CT** (applicable for 2D/3D data)
+  * **OTLS** (applicable for 2D/3D data)
 * `--encoder`: Feature extractor of choice (Please refer to models/feature_extractor/)
+  * If 2D encoders are chosen for 3D patches, the encoder will encode feature for each patch slice and average the features within each 3D patch. 
 * `--augment_fold`: Number of augmentations to perform (if 0, no augmentation performed)
 
 ### Training
@@ -108,6 +109,7 @@ CUDA_VISIBLE_DEVICES=0 python train_cv.py --config conf/config_MIL.yaml --sample
 ```
 
 Some flags include:
+* `--config`: YAML file that contains training parameters. These can be overriden with command-line arguments.
 * `--split_mode`: 'loo' for leave-one-out CV and 'kf' for k-fold CV
 * `--prop_train`: Proportion of training dataset to use for training (rest is used for validation)
 * `--sample_prop`: Proportion of patches to sample from each bag of patches
@@ -130,24 +132,25 @@ Some flags include:
 ### Visualization
 To visualize a 3D image in Napari, you can run the following command:
 ```
-python visualize.py /path/to/image_slices_folder/ --rgb
+python visualize.py IMAGE_PATH --rgb
 ```
 This will open the image slices in napari, which then enables easy 3D visualization as well as the ability to generate animations with the 3d image.
 
 ### Phantom Dataset Generation
 If you wish to generate a phantom dataset of cell-like structures with which to analyze in a pipeline, you can run the following script:
 ```
-python gen_artificial_data.py /path/to/phantom_data_folder 75 --n_classes 3 --n_obj 300 --type cells --h 256 --w 256 --d 256 --mode L --size 20 --resize 2.0 4.0 4.0 --prefix gen-img
+python gen_artificial_data.py SAVE_PATH 75 --n_classes 3 --n_obj 300 --type cells --h 256 --w 256 --d 256 --mode L --size 20 --resize 2.0 4.0 4.0 --prefix gen-img
 ```
 This will generate 75 artificial 3D images populated with cell-like structures, whose properties are determined by statistical distributions that can be manually modified via the gen_3d_img() function in utils/image_gen_utils.py. This command also specifies that the 3D images are generated as 256x256x256 but then scaled to 512x1024x1024, and that the images are black and white.
 
 ## Post-hoc interpretation
 To create interpretable heatmap imposed on the raw volumetric image
 ```
-CUDA_VISIBLE_DEVICES=0 python create_heatmaps.py --config conf/config_heatmap_CT.yaml --mode full
+CUDA_VISIBLE_DEVICES=0 python create_heatmaps.py --config conf/config_heatmap.yaml --mode full
 ```
+The example heatmaps can be visualized at our interactive demo. [[Interactive Demo]](https://mamba-demo.github.io/demo/)
 
 ## Contact
 For any suggestions or issues, please contact Andrew H. Song <asong@bwh.harvard.edu>
 
-<img src=https://raw.githubusercontent.com/mahmoodlab/mamba/main/docs/images/joint_logo.png> 
+<img src=docs/images/joint_logo.png> 
