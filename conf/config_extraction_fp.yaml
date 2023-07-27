@@ -1,0 +1,25 @@
+data_dir: '/media/andrew/microCT/Prostate/tiff'
+save_dir: '/home/andrew/data/microCT'
+mask_dir: ~
+process_list: '/home/andrew/workspace/ThreeDimPlayground/csv/CT/process_list_seg.csv'
+
+patch_mode: '3D'
+batch_size: 50
+patch_size: 128
+step_size: 24
+step_z: 12
+target_patch_size: 128
+augment_fold: 10
+slice_mode: 'all'
+thresh_mode: 'global'
+
+
+encoder: 'resnet50_3d' # Feature extractor encoder 'resnet18', 'resnet34', 'resnet50', or 'SwinUNETR'
+data_mode: 'CT'
+
+pretrained:
+  load_weights: True # False, random init
+#  pretrained_name: 'swinvit'  # Name of the folder
+  pretrained_name: 'imagenet_mean_HE'
+  pretrained_path: 'imagenet'
+#  pretrained_path: '/media/andrew/model_swinvit.pt'
