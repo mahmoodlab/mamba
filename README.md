@@ -2,9 +2,9 @@
 
 ### Weakly Supervised AI for Efficient Analysis of 3D Pathology Samples
 
-[Arxiv] | [[Interactive Demo]](https://mamba-demo.github.io/demo/)
+[[Arxiv]](https://arxiv.org/abs/2307.14907) | [[Interactive Demo]](https://mamba-demo.github.io/demo/)
 
-**M**odality-**A**gnostic **M**ultiple instance learning framework for volumetric **B**lock **A**nalysis (**MAMBA**) is a deep-learning-based computational pipeline for volumetric image analysis that can perform weakly-supervised patient prognostication based on 3D morphological features without the need for manual annotations by pathologists.
+**M**odality-**A**gnostic **M**ultiple instance learning for volumetric **B**lock **A**nalysis (**MAMBA**) is a deep-learning-based computational pipeline for volumetric image analysis that can perform weakly-supervised patient prognostication based on 3D morphological features without the need for manual annotations by pathologists.
 With the rapid growth and adoption of 3D spatial biology and pathology techniques by researchers and clinicians, MAMBA provides a general and efficient framework for 3D weakly supervised learning for clinical decision support and to reveal novel 3D morphological biomarkers and insights for prognosis and therapeutic response.  
 
 <div>
@@ -117,7 +117,7 @@ Some flags include:
 * `--seed_data`: Random seed for data splits
 * `--encoder`: Feature extractor. Must match the extractor used in the previous step
 * `--task`: Classification (clf) or survival (surv)
-* `--decoder_enc`: If specified, Add one-layer MLP encoder on top of the features for further encoding (Useful for learning more discriminative features at the risk of overfitting due to increased number of parameters)
+* `--decoder_enc`: If specified, Add shallow MLP encoder on top of the features for further encoding (Useful for learning more discriminative features at the risk of overfitting due to increased number of parameters)
 
 ### Testing
 The trained models can be used to perform inference on a new sample
