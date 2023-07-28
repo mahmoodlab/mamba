@@ -139,9 +139,9 @@ This will open the image slices in napari, which then enables easy 3D visualizat
 ### Phantom Dataset Generation
 If you wish to generate a phantom dataset of cell-like structures with which to analyze in a pipeline, you can run the following script:
 ```
-python gen_artificial_data.py SAVE_PATH 75 --n_classes 3 --n_obj 300 --type cells --h 256 --w 256 --d 256 --mode L --size 20 --resize 2.0 4.0 4.0 --prefix gen-img
+python gen_artificial_data.py SAVE_PATH 50 --n_classes 2 --n_obj 300 --type cells --h 256 --w 256 --d 256 --mode RGB --size 20 --resize 2.0 4.0 4.0 --prefix gen-img
 ```
-This will generate 75 artificial 3D images populated with cell-like structures, whose properties are determined by statistical distributions that can be manually modified via the gen_3d_img() function in utils/image_gen_utils.py. This command also specifies that the 3D images are generated as 256x256x256 but then scaled to 512x1024x1024, and that the images are black and white.
+This will generate 50 artificial 3D images populated with cell-like structures, whose properties are determined by statistical distributions that can be manually modified via the gen_3d_img() function in utils/image_gen_utils.py. This command also specifies that the 3D images are generated as 256x256x256 but then scaled to 512x1024x1024, and that the images are RGB.
 
 ## Post-hoc interpretation
 To create interpretable heatmap imposed on the raw volumetric image

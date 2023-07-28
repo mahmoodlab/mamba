@@ -72,7 +72,7 @@ def load_df(csv_path, label='BCR', days_label='BCR_days'):
     """
     df = pd.read_csv(csv_path, dtype={'patient_id': 'str'})
     df = df[df[label].notna()]  # Drop patients that do not have BCR record
-    if days_label:
+    if days_label and days_label in df:
         df.loc[df[days_label].isna(), days_label] = 365 * 5 # Fill in NaNs
 
     print("======================")
@@ -84,12 +84,12 @@ def load_df(csv_path, label='BCR', days_label='BCR_days'):
     df[label] = le.transform(df[label])
 
     cols2keep = ['patient_id', 'slide_id', label]
-    if days_label:
+    if days_label and days_label in df:
         cols2keep.append(days_label)
     df_processed = df[cols2keep]
 
     df_processed = df_processed.rename(columns={label: 'event'})
-    if days_label:
+    if days_label and days_label in df:
         df_processed = df_processed.rename(columns={days_label: 'event_days'})
 
     # Cast types

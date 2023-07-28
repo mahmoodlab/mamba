@@ -137,7 +137,7 @@ class ToTensorVideo(object):
 class Normalize(object):
     def __init__(self, mode='CT'):
         super().__init__()
-        if mode == 'CTres':
+        if mode == 'CT':
             self.mean = (0.45, 0.45, 0.45)
             self.std = (0.225, 0.225, 0.225)
         elif mode == 'HE':
@@ -149,9 +149,9 @@ class Normalize(object):
     def __call__(self, img):
         for channel in range(img.shape[0]):
             if torch.std(img[channel]) == 0:
-                img[channel] = (img[channel] - self.mean(img[channel]))
+                img[channel] = (img[channel] - self.mean[channel])
             else:
-                img[channel] = (img[channel] - self.mean(img[channel])) / self.std(img[channel])
+                img[channel] = (img[channel] - self.mean[channel]) / self.std[channel]
 
         return img
 

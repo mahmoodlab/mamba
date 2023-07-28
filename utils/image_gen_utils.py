@@ -267,7 +267,7 @@ def add_cell(img, cell_probs, cells, center=None):
     return img
 
 
-def gen_3d_img(n_obj, d, w, h, size=32, item_type='sphere', case=0, location=None, mode='RGB', bkgrd=5):
+def gen_3d_img(n_obj, d, w, h, size=32, item_type='sphere', case=0, n_cases=3, location=None, mode='RGB', bkgrd=5):
     if mode=='RGB':
         shape = (d, w, h, 3)
     elif mode=='L':
@@ -319,59 +319,58 @@ def gen_3d_img(n_obj, d, w, h, size=32, item_type='sphere', case=0, location=Non
         uniform_angle_dist = empty_comp_fun(get_orients_angle_vector, 
                                 create_dist_fun(['uniform', 'uniform'], [0, 0], [2*math.pi, 2*math.pi]))
         if mode=='RGB':
-            normal_gray = create_dist_fun(['normal', 'normal', 'normal'], [119, 119, 119], [3, 3, 3], 0, 255)
-            intense_gray = create_dist_fun(['normal', 'normal', 'normal'], [137, 137, 137], [3, 3, 3], 0, 255)
             blue_dist = create_dist_fun(['normal', 'normal', 'normal'], [0, 0, 200], [0, 0, 9], 0, 255)
             green_dist = create_dist_fun(['normal', 'normal', 'normal'], [0, 200, 0], [0, 9, 0], 0, 255)
             red_dist = create_dist_fun(['normal', 'normal', 'normal'], [200, 0, 0], [9, 0, 0], 0, 255)
+            if n_cases==2:
+                case_colors = [blue_dist, red_dist]
+            elif n_cases==3:
+                case_colors = [blue_dist, green_dist, red_dist]
         elif mode=='L':
             normal_gray = create_dist_fun(['normal'], [119], [9], 0, 255)
             intense_gray = create_dist_fun(['normal'], [137], [9], 0, 255)
-        normal_length = create_dist_fun(['normal'], [size], [round(size/6)], 8, 40)
-        abnormal_length = create_dist_fun(['normal'], [round(size*1.4)], [round(size/6)], 8, 40)
-        # normal_length = create_dist_fun(['normal'], [size], [round(size/6)], 8, 40)
-        # abnormal_length = create_dist_fun(['normal'], [round(size*1.25)], [round(size/6)], 8, 40)
-        # abnormal_2_length = create_dist_fun(['normal'], [round(size*1.5)], [round(size/6)], 8, 40)
-        normal_ecc = create_dist_fun(['normal'], [0.25], [0.05], 0, 0.95)
-        abnormal_ecc = create_dist_fun(['normal'], [0.7], [0.05], 0, 0.95)
-        # normal_ecc = create_dist_fun(['normal'], [0.15], [0.05], 0, 0.95)
-        # abnormal_ecc = create_dist_fun(['normal'], [0.45], [0.05], 0, 0.95)
-        # abnormal_2_ecc = create_dist_fun(['normal'], [0.75], [0.05], 0, 0.95)
+            super_gray = create_dist_fun(['normal'], [155], [9], 0, 255)
+            if n_cases==2:
+                case_colors = [normal_gray, super_gray]
+            elif n_cases==3:
+                case_colors = [normal_gray, intense_gray, super_gray]
         uniform_thickness = create_dist_fun(['uniform'], [3], [0])
-        reg_cell_membrane = SpheroidStructure(uniform_angle_dist, normal_length, normal_ecc, uniform_thickness, blue_dist)
-        healthy_cell = CellType([reg_cell_membrane])
-        # irreg_cell_membrane = SpheroidStructure(uniform_angle_dist, abnormal_length, abnormal_ecc, uniform_thickness, green_dist)
-        irreg_cell_membrane = SpheroidStructure(uniform_angle_dist, abnormal_length, abnormal_ecc, uniform_thickness, red_dist)
-        unhealthy_cell = CellType([irreg_cell_membrane])
-        # irreg_cell_2_membrane = SpheroidStructure(uniform_angle_dist, abnormal_2_length, abnormal_2_ecc, uniform_thickness, red_dist)
-        # unhealthy_cell_2 = CellType([irreg_cell_2_membrane])
-        cells = [healthy_cell, unhealthy_cell]
-        # cells = [healthy_cell, unhealthy_cell, unhealthy_cell_2]
-        normal_region_probs = [0.9, 0.1]
-        abnormal_region_probs = [0.1, 0.9]
-        # normal_region_probs = [0.8, 0.1, 0.1]
-        # abnormal_region_probs = [0.1, 0.8, 0.1]
-        # abnormal_2_region_probs = [0.1, 0.1, 0.8]
+        if n_cases==2:
+            normal_length = create_dist_fun(['normal'], [size], [round(size/6)], 8, 40)
+            abnormal_length = create_dist_fun(['normal'], [round(size*1.4)], [round(size/6)], 8, 40)
+            normal_ecc = create_dist_fun(['normal'], [0.25], [0.05], 0, 0.95)
+            abnormal_ecc = create_dist_fun(['normal'], [0.7], [0.05], 0, 0.95)
+            reg_cell_membrane = SpheroidStructure(uniform_angle_dist, normal_length, normal_ecc, uniform_thickness, case_colors[0])
+            healthy_cell = CellType([reg_cell_membrane])
+            irreg_cell_membrane = SpheroidStructure(uniform_angle_dist, abnormal_length, abnormal_ecc, uniform_thickness, case_colors[1])
+            unhealthy_cell = CellType([irreg_cell_membrane])
+            cells = [healthy_cell, unhealthy_cell]
+            normal_region_probs = [0.9, 0.1]
+            abnormal_region_probs = [0.1, 0.9]
+            case_probs = [normal_region_probs, abnormal_region_probs]
+        elif n_cases==3:
+            normal_length = create_dist_fun(['normal'], [size], [round(size/6)], 8, 40)
+            abnormal_length = create_dist_fun(['normal'], [round(size*1.25)], [round(size/6)], 8, 40)
+            abnormal_2_length = create_dist_fun(['normal'], [round(size*1.5)], [round(size/6)], 8, 40)
+            normal_ecc = create_dist_fun(['normal'], [0.15], [0.05], 0, 0.95)
+            abnormal_ecc = create_dist_fun(['normal'], [0.45], [0.05], 0, 0.95)
+            abnormal_2_ecc = create_dist_fun(['normal'], [0.75], [0.05], 0, 0.95)
+            reg_cell_membrane = SpheroidStructure(uniform_angle_dist, normal_length, normal_ecc, uniform_thickness, case_colors[0])
+            healthy_cell = CellType([reg_cell_membrane])
+            irreg_cell_membrane = SpheroidStructure(uniform_angle_dist, abnormal_length, abnormal_ecc, uniform_thickness, case_colors[1])
+            unhealthy_cell = CellType([irreg_cell_membrane])
+            irreg_cell_2_membrane = SpheroidStructure(uniform_angle_dist, abnormal_2_length, abnormal_2_ecc, uniform_thickness, case_colors[2])
+            unhealthy_cell_2 = CellType([irreg_cell_2_membrane])
+            cells = [healthy_cell, unhealthy_cell, unhealthy_cell_2]
+            normal_region_probs = [0.8, 0.1, 0.1]
+            abnormal_region_probs = [0.1, 0.8, 0.1]
+            abnormal_2_region_probs = [0.1, 0.1, 0.8]
+            case_probs = [normal_region_probs, abnormal_region_probs, abnormal_2_region_probs]
+        else:
+            print("Unsupported number of cases!")
         for i in range(n_obj):
             l, w, h = shape[0], shape[1], shape[2]
-            location = (int(np.random.random_sample()*l), 
-                        int(np.random.random_sample()*w), 
-                        int(np.random.random_sample()*h))
-            if case==1:
-                off_region = (int(np.random.random_sample()*(l * 1/3)), 
-                    int(np.random.random_sample()*(w * 1/3)), 
-                    int(np.random.random_sample()*(h * 1/3)))
-                # art_img = add_cell(art_img, abnormal_region_probs, cells, center=location)
-                if (location[0] >= off_region[0] and location[0] < off_region[0]+l*2/3
-                    and location[1] >= off_region[1] and location[1] < off_region[1]+w*2/3
-                    and location[2] >= off_region[2] and location[2] < off_region[2]+h*2/3):
-                    art_img = add_cell(art_img, abnormal_region_probs, cells, center=location)
-                else:
-                    art_img = add_cell(art_img, normal_region_probs, cells, center=location)
-            # elif case==2:
-            #     art_img = add_cell(art_img, abnormal_2_region_probs, cells, center=location)
-            else:
-                art_img = add_cell(art_img, normal_region_probs, cells, center=location)
+            art_img = add_cell(art_img, case_probs[case], cells, center=location)
             print(f'  Added {i+1}/{n_obj} cells...', end='\r')
 
     else:
@@ -384,8 +383,6 @@ def save_generated_img(img, dirpath, mode='RGB', filetype='tiff', resize=[1.0]):
     if not os.path.isdir(dirpath):
         Path(dirpath).mkdir(parents=True, exist_ok=True)
     prefix = os.path.basename(dirpath).split('_')[0]
-    # if not os.path.isdir(f"{dirpath}/../{prefix}_before/"):
-    #     Path(f"{dirpath}/../{prefix}_before/").mkdir(parents=True, exist_ok=True)
     if not resize == [1.0]:
         (d, h, w) = img.shape[:3]
         new_shape = list(img.shape)
@@ -435,19 +432,8 @@ def save_generated_img(img, dirpath, mode='RGB', filetype='tiff', resize=[1.0]):
 
             ds.save_as(filename)
         else:
-            # a = np.asarray(img_slice)
-            # new_arr = np.zeros(a.shape[:2])
-            # for i in range(len(a)):
-            #     for j in range(len(a[0])):
-            #         val = max(a[i, j])
-            #         new_arr[i, j] = val
-            # new_arr = np.moveaxis(new_arr, -1, 0)
-            # new_img = Image.fromarray(np.uint8(new_arr), mode="L")
-            # new_img = Image.fromarray(a).resize((w*2, h*2))
             img_filename = f'{dirpath}/{prefix}_{str(x).zfill(len(str(img.shape[0])))}.{filetype}'
             img_slice.save(img_filename)
-            # new_filename = img_filename.replace('phantom_surv_color', 'phantom_surv_gray')
-            # new_img.save(new_filename)
         write_metadata_template(dirpath+'/'+prefix+'_meta.dat')
     print(f'Saved {dirpath}')
 

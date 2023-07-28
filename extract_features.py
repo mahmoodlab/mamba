@@ -196,7 +196,7 @@ if __name__ == '__main__':
                         help='name of list of images to process with parameters (.csv)')
     parser.add_argument('--encoder', type=str,
                         help='cnn feature extractor to use')
-    parser.add_argument('--target_patch_size_z', type=int,
+    parser.add_argument('--target_patch_size_z', type=int, default=96,
                         help='the desired size of patches for optional scaling before feature embedding')
     parser.add_argument('--target_patch_size', type=int, default=96,
                         help='the desired size of patches for optional scaling before feature embedding')
