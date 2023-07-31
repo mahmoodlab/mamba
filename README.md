@@ -28,7 +28,7 @@ With the rapid growth and adoption of 3D spatial biology and pathology technique
 © This code and corresponding models are made available for non-commercial academic purposes and is licenced under [the Creative Commons Attribution Non Commercial No Derivatives 4.0 International license](https://creativecommons.org/licenses/by-nc-nd/4.0/). Commercial entities may contact us or the Mass General Brigham Innovations office.
 
 ## Updates
-**(07/27/23)** The github is now live. Detailed tutorials are coming soon.
+**(07/27/23)** The github is now live. Detailed tutorials are coming soon, so stay tuned!
 
 ## Installation
 Run the following code to install all dependencies.
