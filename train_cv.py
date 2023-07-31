@@ -33,7 +33,7 @@ from sksurv.util import Surv
 from torch.optim.lr_scheduler import CosineAnnealingLR, ReduceLROnPlateau
 
 
-def gen_clf_plots(conf, y_true, y_pred, prob_pred, data_surv, survival_list, event_list, result_path):
+def gen_clf_plots(conf, y_true, y_pred, prob_pred, result_path):
     # Plot
     ConfusionMatrixDisplay.from_predictions(y_true, y_pred)
     plt.savefig(os.path.join(result_path, 'confusion_mat.png'), bbox_inches='tight')
@@ -42,19 +42,6 @@ def gen_clf_plots(conf, y_true, y_pred, prob_pred, data_surv, survival_list, eve
         RocCurveDisplay.from_predictions(y_true, prob_pred[:, 1])
         plt.savefig(os.path.join(result_path, 'roc.png'), bbox_inches='tight')
 
-    # Plot KM curve
-    if len(np.unique(y_pred)) <= 1:
-        print("Cannot print survival curve due to only one class existing in predictions!")
-    else:
-        chisq, pvalue, stats, covar = compare_survival(data_surv, y_pred, return_stats=True)
-        surv_dict, event_dict = prepare_surv_dict(survival_list, event_list, y_pred)
-        title = 'p-val: {0:.3e} '.format(pvalue)
-        plot_KM(surv_dict,
-                event_dict,
-                title=title,
-                fname=os.path.join(result_path, 'km_curve.png'))
-
-    
 
 
 # Sets the seed and creates the result folders
@@ -136,6 +123,7 @@ def load_and_split(conf):
 
     df, split_indices = load_aug_split_df(csv_path=conf['clinical_path'],
                                           label=conf['label'],
+                                          task=conf['task'],
                                           days_label=conf['days_label'],
                                           split_mode=conf['split_mode'],
                                           n_splits=conf['split_fold'],
@@ -386,8 +374,6 @@ def process_results(conf, results_fold, evaler_all, data_lists, result_path):
     print(f'\neval_results aggregated: {results_all}')
     print(f'\neval_results per fold: {results_fold}')
 
-    data_surv = Surv.from_arrays(data_lists['event'], data_lists['survival'])
-
     if conf['task'] == 'clf':
         y_true, y_pred, prob_pred = evaler_all.get_preds()
         print(f'y_pred: {y_pred}')
@@ -402,7 +388,7 @@ def process_results(conf, results_fold, evaler_all, data_lists, result_path):
         with open(os.path.join(result_path, 'result.pkl'), 'wb') as f:
             pickle.dump(results, f)
 
-        gen_clf_plots(conf, y_true, y_pred, prob_pred, data_surv, data_lists['survival'], data_lists['event'], result_path)
+        gen_clf_plots(conf, y_true, y_pred, prob_pred, result_path)
 
     elif conf['task'] == 'surv':
         results = {key: val for key, val in data_lists.items()}

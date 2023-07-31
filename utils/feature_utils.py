@@ -3,7 +3,7 @@ import torch
 import time
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from data.collate import collate_features, collate_slowfast
+from data.collate import collate_features
 from data.transforms import get_basic_data_transforms
 from data.ThreeDimDataset import RawImgBag
 from utils.file_utils import save_hdf5
@@ -88,7 +88,7 @@ def extract_patch_features(dataset,
     Returns:
 
     """
-    collate_fn = collate_slowfast if model_name == 'slowfast' else collate_features
+    collate_fn = collate_features
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if device.type == "cuda" else {}
 

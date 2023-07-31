@@ -11,18 +11,6 @@ def collate_features(batch):
 
     return [img, coords]
 
-def collate_slowfast(batch):
-    """
-    Collate function for SlowFast dataset
-    """
-
-    img_slow = torch.stack([item[0] for item in batch], dim=0)
-    img_fast = torch.stack([item[1] for item in batch], dim=0)
-    inp = [img_slow, img_fast]
-
-    coords = np.vstack([item[2] for item in batch])
-    return [inp, coords]
-
 def collate_MIL(batch):
     img = torch.cat([item[0] for item in batch], dim=0)
     label = torch.LongTensor([item[1] for item in batch])

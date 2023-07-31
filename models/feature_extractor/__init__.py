@@ -9,16 +9,12 @@ The current options are
 - Res2plus1d (3D): (2+1)D CNN (with Resnet50 backbone) pretrained on Kinetics-400
     - Latent dim: 1024
     - Reference: Tran D et al., A closer look at spatiotemporal convolutions for action recognition (https://arxiv.org/pdf/1711.11248.pdf)
-- SlowFast (3D): Slow/Fast pathway network (with Resnet50 backbone) pretrained on Kinetics-400
-    - Latent dim: 1152
-    - Reference: Feichtenhofer C et al., SlowFast Networks for Video Recognition (https://arxiv.org/pdf/1812.03982.pdf)
 """
 
 from .ResnetInflated import resnet_3d
 from .Resnet import resnet_2d
 from .SwinUNETR import swin_unetr_base
 from .Resnet2plus1d import resnet2plus1d
-from old.models.feature_extractor.SlowFast import slowfast
 from .Swin3D import swin3d_s, swin3d_b
 from .Swin2D import swin2d_s, swin2d_b
 
@@ -72,9 +68,6 @@ def get_extractor_model(encoder='2plus1d',
     elif encoder == '2plus1d':
         assert mode == '3D', '2plus1d only works on 3D!'
         model = resnet2plus1d()
-    elif encoder == 'slowfast':
-        assert mode == '3D', 'SlowFast only works on 3D!'
-        model = slowfast()
     else:
         raise NotImplementedError("{} not implemented!".format(encoder))
 

@@ -256,35 +256,6 @@ class ImgBag(Dataset):
         return img, self.coords[idx]
 
 
-class ImgBagSlowFast(ImgBag):
-    """
-    Dataset for SlowFast Network
-    """
-    def __init__(self,
-                 file_path,
-                 patch_mode='3D',
-                 transform=None,
-                 alpha=8,
-                 clip_min=0,
-                 clip_max=65000):
-        super().__init__(file_path, patch_mode, transform, clip_min, clip_max)
-        self.alpha = alpha
-
-    def __getitem__(self, idx):
-        img = transform_img(self.img[idx],
-                            clip_min=self.clip_min,
-                            clip_max=self.clip_max,
-                            transform=self.transform).float()
-
-        img_slow = torch.index_select(img, 1,
-            torch.linspace(0, img.shape[1] - 1, img.shape[1] // self.alpha).long(),
-        )
-
-        img_fast = img
-
-        return img_slow, img_fast, self.coords[idx]
-
-
 class SimpleFeatsBag(Dataset):
     """
     Simple dataset to batchify input to prevent OOM

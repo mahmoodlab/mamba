@@ -18,7 +18,7 @@ import torch.nn as nn
 from models.feature_extractor import get_extractor_model
 from utils.exp_utils import update_config
 from utils.feature_utils import extract_patch_features
-from data.ThreeDimDataset import ImgBag, ImgBagSlowFast
+from data.ThreeDimDataset import ImgBag
 from data.transforms import get_basic_data_transforms
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -121,16 +121,10 @@ def extract_features(conf):
             continue
 
         # If no issue, proceed with patch loading
-        if conf['encoder'] == 'slowfast':
-            img_dataset = ImgBagSlowFast(file_path=patches_h5_path,
-                                         patch_mode=conf['patch_mode'],
-                                         clip_min=clip_min,
-                                         clip_max=clip_max)
-        else:
-            img_dataset = ImgBag(file_path=patches_h5_path,
-                                 patch_mode=conf['patch_mode'],
-                                 clip_min=clip_min,
-                                 clip_max=clip_max)
+        img_dataset = ImgBag(file_path=patches_h5_path,
+                                patch_mode=conf['patch_mode'],
+                                clip_min=clip_min,
+                                clip_max=clip_max)
 
         # Augmentation loop
         for aug_idx in range(conf['augment_fold'] + 1):

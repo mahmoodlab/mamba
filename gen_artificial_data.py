@@ -54,7 +54,6 @@ def create_csv(csv_type, class_types, class_counts, prefixes, label_counts, save
         images have label=0, the next 20 have label=1, and the final 10 have label=2.
     -save_path (string): The full or relative filepath to save the generated csv file as.
     """
-    print(label_counts)
     d = {}
     names = []
     classes = []

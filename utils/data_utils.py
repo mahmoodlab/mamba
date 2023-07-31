@@ -66,7 +66,7 @@ def augment_df(df, numOfaug=3):
     return df_new
 
 
-def load_df(csv_path, label='BCR', days_label='BCR_days'):
+def load_df(csv_path, task='clf', label='BCR', days_label='BCR_days'):
     """
     Load dataframe and process the columns
     """
@@ -95,13 +95,17 @@ def load_df(csv_path, label='BCR', days_label='BCR_days'):
     # Cast types
     df_processed['patient_id'] = df_processed['patient_id'].astype(str)
     df_processed['slide_id'] = df_processed['slide_id'].astype(str)
-    df_processed['event'] = df_processed['event'].astype(bool)
+    if task=='surv':
+        df_processed['event'] = df_processed['event'].astype(bool)
+    else:
+        df_processed['event'] = df_processed['event'].astype(int)
     df_processed = df_processed.set_index('patient_id')
 
     return df_processed
 
 
 def stratify_df(df,
+                task='clf',
                 numOfbins=2,
                 event_col='event',
                 time_col='event_days',
@@ -113,7 +117,7 @@ def stratify_df(df,
     """
 
     # Stratify uncensored patients into percentile bins
-    if numOfbins > 1:
+    if task=='surv':
         event_mask = df[event_col].astype(bool)
         uncensored_df = df[event_mask]
         times_no_censor = uncensored_df[time_col]
@@ -152,6 +156,7 @@ def stratify_df(df,
 
 def load_aug_split_df(csv_path,
                       label='BCR',
+                      task='clf',
                       days_label=None,
                       prop_train=0.7,
                       split_mode='loo',
@@ -174,9 +179,9 @@ def load_aug_split_df(csv_path,
     """
 
     # Load dataframe
-    df_pre_aug_strat = load_df(csv_path, label, days_label)
+    df_pre_aug_strat = load_df(csv_path, task, label, days_label)
     # Stratify loaded dataframe
-    df_pre_aug = stratify_df(df_pre_aug_strat,
+    df_pre_aug = stratify_df(df_pre_aug_strat, task=task,
                              numOfbins=numOfbins,
                              stratify_col_name=stratify_col_name)
 
