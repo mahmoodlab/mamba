@@ -43,14 +43,18 @@ def gen_clf_plots(conf, y_true, y_pred, prob_pred, data_surv, survival_list, eve
         plt.savefig(os.path.join(result_path, 'roc.png'), bbox_inches='tight')
 
     # Plot KM curve
-    chisq, pvalue, stats, covar = compare_survival(data_surv, y_pred, return_stats=True)
-    surv_dict, event_dict = prepare_surv_dict(survival_list, event_list, y_pred)
+    if len(np.unique(y_pred)) <= 1:
+        print("Cannot print survival curve due to only one class existing in predictions!")
+    else:
+        chisq, pvalue, stats, covar = compare_survival(data_surv, y_pred, return_stats=True)
+        surv_dict, event_dict = prepare_surv_dict(survival_list, event_list, y_pred)
+        title = 'p-val: {0:.3e} '.format(pvalue)
+        plot_KM(surv_dict,
+                event_dict,
+                title=title,
+                fname=os.path.join(result_path, 'km_curve.png'))
 
-    title = 'p-val: {0:.3e} '.format(pvalue)
-    plot_KM(surv_dict,
-            event_dict,
-            title=title,
-            fname=os.path.join(result_path, 'km_curve.png'))
+    
 
 
 # Sets the seed and creates the result folders

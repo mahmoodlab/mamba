@@ -28,11 +28,11 @@ def gen_data(type, n_samples, save_prefix, mode='RGB', n_classes=2, n_obj=100, d
     """
     n_digits = len(str(int(n_samples)))
     samples_per = n_samples / n_classes
-    print(resize)
     for i in tqdm(range(n_samples)):
         case = math.floor(i/samples_per)
-        cells_phantom = gen_3d_img(n_obj, d, w, h, size, type, case, mode=mode)
-        save_generated_img(cells_phantom, save_prefix+'_'+type+'_'+str(i).zfill(n_digits), mode=mode, filetype=filetype, resize=resize)
+        cells_phantom = gen_3d_img(n_obj, d, w, h, size, type, case, n_classes, mode=mode)
+        img_path = save_prefix+'_'+type+'_'+str(i).zfill(n_digits)
+        save_generated_img(cells_phantom, img_path, mode=mode, filetype=filetype, resize=resize)
 
 
 def create_csv(csv_type, class_types, class_counts, prefixes, label_counts, save_path):
@@ -126,8 +126,9 @@ if __name__ == '__main__':
                         help='Generated image width.')
     parser.add_argument('--d', default=360, type=int,
                         help='Generated image depth.')
-    parser.add_argument('--resize', default=1.0, type=float, nargs="+",
-                        help='Values to multiply the (D,H,W) original image size by before saving (only first three provided values will be used).')
+    parser.add_argument('--resize', default=[1.0], type=float, nargs="+",
+                        help='Values to multiply the (D,H,W) original image size by before saving. If only one value exists'
+                        ' in the list it will be used for all three, otherwise the first three values will be utilized.')
     parser.add_argument('--mode', default='RGB', type=str, choices=['L', 'RGB'],
                         help='Generated image mode (how colors are stored in data).')
     parser.add_argument('--filetype', type=str, default='tiff',
@@ -135,19 +136,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    img_dir = args.save_dir_path
+    img_dir = os.path.join(args.save_dir_path, args.prefix)
     Path(img_dir).mkdir(parents=True, exist_ok=True)
-    if img_dir[-1] == '/':
-        filepath_prefix = img_dir + args.prefix
-    else:
-        filepath_prefix = img_dir + '/' + args.prefix
+    ## Use the directory+prefix as the full filepath prefix when saving individual images
+    img_path_prefix = os.path.join(img_dir, args.prefix)
+
     n_digits = len(str(int(args.n_samples)))
 
-    gen_data(args.type, args.n_samples, filepath_prefix, args.mode, args.n_classes, args.n_obj, args.d, args.w, args.h, 
+    gen_data(args.type, args.n_samples, img_path_prefix, args.mode, args.n_classes, args.n_obj, args.d, args.w, args.h, 
             args.size, args.resize, args.filetype)
     create_csv('patching', ['cells'], [args.n_samples], [args.prefix], 
-                [round(args.n_samples/args.n_classes)]*args.n_classes, filepath_prefix+'_patching.csv')
+                [round(args.n_samples/args.n_classes)]*args.n_classes, img_path_prefix+'_patching.csv')
     create_csv('clinical', ['cells'], [args.n_samples], [args.prefix], 
-                [round(args.n_samples/args.n_classes)]*args.n_classes, filepath_prefix+'_clinical.csv')
+                [round(args.n_samples/args.n_classes)]*args.n_classes, img_path_prefix+'_clinical.csv')
 
     print('done')

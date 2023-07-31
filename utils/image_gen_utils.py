@@ -126,16 +126,11 @@ class SpheroidStructure():
 
     def add_struct(self, img, center):
         a = self.len_fun() / 2
-        # print(f'a: {a}')
         c = self.ecc_fun() * a
-        # print(f'c: {c}')
         thickness = round(self.thickness_fun())
-        # print(f'thickness: {thickness}')
         val = self.val_fun()
         angle_vec = self.angle_vec_fun()
         l, w, h = img.shape[0], img.shape[1], img.shape[2]
-        # print(f'Img shape: {img.shape}')
-        # print(f'Center: {center}')
         x_adj, y_adj, z_adj = angle_vec
         v1 = [center[0] + a * x_adj, center[1] + a * y_adj, center[2] + a * z_adj]
         v1 = np.trunc(v1).astype(int)
@@ -145,11 +140,8 @@ class SpheroidStructure():
         f1 = np.trunc(f1).astype(int)
         f2 = [center[0] - c * x_adj, center[1] - c * y_adj, center[2] - c * z_adj]
         f2 = np.trunc(f2).astype(int)
-        # print(f'v1: {v1}')
-        # print(f'v2: {v2}')
         total_dist = math.dist(v1, f1) + math.dist(v1, f2)
         prin_ax = get_line(v1, v2, density=9.0)
-        # print(f'Principle axis: {prin_ax}')
         points = []
         r0_count = 0
         for pt in prin_ax:
@@ -160,20 +152,14 @@ class SpheroidStructure():
                 numer_sq = (d1**4 + d2**4 + total_dist**4 
                             - 2*(d1**2)*(d2**2) - 2*(d1**2)*(total_dist**2) - 2*(d2**2)*(total_dist**2)
                                     )
-            # if numer_sq < 0: # Due to rounding issues
-            #     print(numer_sq)
-            #     numer_sq = 0.0
-            # print(f'{numer_sq}: {d1}, {d2}, {total_dist}')
             r_max = round(math.sqrt(numer_sq)/(2*total_dist))
             if r_max <= 0:
                 r0_count += 1
             else:
                 for r in range(max(0, r_max - thickness), r_max+1):
                     circ_pts = get_circle(pt, r, angle_vec, 9.0)
-                    # print(f'Circle points: {circ_pts}')
                     for circ_pt in circ_pts:
                         points.append(circ_pt)
-        # print(f'Total points: {len(points)}')
         if r0_count > 4:
             print(f'a: {a}, c: {c}, thickness: {thickness}, val: {val}, av: {angle_vec}, r0_count: {r0_count}')
         for pt in points:

@@ -46,7 +46,6 @@ def get_basic_data_transforms(augment=True, patch_mode='3D', data_mode='CT', inv
             ToTensorMultiDim(),
             geometric_transforms(patch_mode),
             intensity_transforms(data_mode),
-            RandomBlurVolume(),
             Normalize(data_mode)
         ])
     else:
@@ -149,9 +148,9 @@ class Normalize(object):
     def __call__(self, img):
         for channel in range(img.shape[0]):
             if torch.std(img[channel]) == 0:
-                img[channel] = (img[channel] - self.mean[channel])
+                img[channel] = (img[channel] - torch.mean(img[channel]))
             else:
-                img[channel] = (img[channel] - self.mean[channel]) / self.std[channel]
+                img[channel] = (img[channel] - torch.mean(img[channel])) / torch.std(img[channel])
 
         return img
 
@@ -215,27 +214,6 @@ class RandomFlip3d(object):
                 flipped = flipped.flip(i)
 
         return flipped
-
-
-class RandomBlurVolume(object):
-    def __init__(self, p=0.5, sigma=[1, 5]):
-        self.p = p
-        self.sigma_lb = sigma[0]
-        self.sigma_ub = sigma[1]
-
-    def __call__(self, img):
-        prob = np.random.rand()
-        img_new = img
-
-        if prob < self.p:
-            img_new = []
-            sigma = np.random.choice(np.arange(self.sigma_lb, self.sigma_ub+1, 2))
-            for idx in range(img.shape[-3]):
-                patch = img[..., idx, :, :]
-                img_new.append(transforms.functional.gaussian_blur(patch, kernel_size=[sigma, sigma]))
-            img_new = torch.stack(img_new, dim=-3)
-
-        return img_new
 
 
 # Intensity transforms
